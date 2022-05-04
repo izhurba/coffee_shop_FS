@@ -22,30 +22,47 @@ class AuthError(Exception):
 
 ## Auth Header
 
-'''
-@TODO implement get_token_auth_header() method
-    it should attempt to get the header from the request
-        it should raise an AuthError if no header is present
-    it should attempt to split bearer and the token
-        it should raise an AuthError if the header is malformed
-    return the token part of the header
-'''
+# Returns token from proper Authorization request
+
 def get_token_auth_header():
-   raise Exception('Not Implemented')
+    authHead = request.headers.get('Authorization')
+    
+    if not authHead:
+        raise AuthError({
+           'code': 'No Header',
+           'description': 'Authorization header not provided'
+        }, 401)
+    
+    authHead = authHead.split(' ')
 
-'''
-@TODO implement check_permissions(permission, payload) method
-    @INPUTS
-        permission: string permission (i.e. 'post:drink')
-        payload: decoded jwt payload
+    if len(authHead) != 2:
+        raise AuthError({
+           'code': 'Malformed Header',
+           'description': 'Improper header length'
+        }, 401)
+    
+    if authHead[0].lower() != 'bearer':
+        raise AuthError({
+           'code': 'Invalid Header',
+           'description': 'Authorization header must start with "bearer"'
+        }, 401)
+    
+    return authHead[1]
 
-    it should raise an AuthError if permissions are not included in the payload
-        !!NOTE check your RBAC settings in Auth0
-    it should raise an AuthError if the requested permission string is not in the payload permissions array
-    return true otherwise
-'''
+# Checks for present permissions string and proper permission in payload
+
 def check_permissions(permission, payload):
-    raise Exception('Not Implemented')
+    if 'permissions' not in payload:
+        raise AuthError({
+           'code': 'No permissions',
+           'description': 'Permissions not present in payload'
+        }, 401)
+    if permission not in payload['permissions']:
+        raise AuthError({
+           'code': 'Incorrect Permission',
+           'description': 'Provided permission is not present in payload'
+        }, 401)
+    return True
 
 '''
 @TODO implement verify_decode_jwt(token) method
