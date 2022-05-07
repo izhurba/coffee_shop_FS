@@ -25,12 +25,9 @@ def get_drinks():
     if not drinks:
         abort(404)
 
-    for drink in drinks:
-        drink.short()
-
     return jsonify({
         'success': True,
-        'drinks': drinks
+        'drinks': [drink.short() for drink in drinks]
     }), 200
 
 # Endpoint to get drinks with recipe in full detail
@@ -44,12 +41,9 @@ def get_drink_detailed(jwt):
         if not drinks:
             abort(404)
         
-        for drink in drinks:
-            drink.long()
-        
         return jsonify({
             'success': True,
-            'drinks': drinks
+            'drinks': [drink.long() for drink in drinks]
         }), 200
         
     except Exception as e:
@@ -66,12 +60,15 @@ def post_drinks(jwt):
     try:
         drink = Drink(
             title = data['title'],
-            recipe = json.dumps(list(data['recipe']))
+            recipe = json.dumps(data['recipe'])
         )
         drink.insert()
+
+        drinks = Drink.query.all()
+
         return jsonify({
             'success': True,
-            'drinks': drink.long()
+            'drinks': [drink.long() for drink in drinks]
         }), 200
     except Exception as e:
         print(e)
@@ -93,9 +90,11 @@ def patch_drink(jwt, id):
             drink.recipe = json.dumps(list(data['recipe']))
         drink.update()
 
+        drinks = Drink.query.all()
+
         return jsonify({
             'success': True,
-            'drinks': drink.long()
+            'drinks': [dk.long() for dk in drinks]
         }),200
     except Exception as e:
         print(e)

@@ -7,7 +7,7 @@ from urllib.request import urlopen
 
 AUTH0_DOMAIN = 'dev-vqzjqwjq.us.auth0.com'        #'udacity-fsnd.auth0.com'
 ALGORITHMS = ['RS256']
-API_AUDIENCE = 'dev'
+API_AUDIENCE = 'coffee-shop'
 
 ## AuthError Exception
 '''
@@ -80,7 +80,7 @@ def check_permissions(permission, payload):
     !!NOTE urlopen has a common certificate error described here: https://stackoverflow.com/questions/50236117/scraping-ssl-certificate-verify-failed-error-for-http-en-wikipedia-org
 '''
 def verify_decode_jwt(token):
-    jUrl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
+    jUrl = urlopen('https://'+ AUTH0_DOMAIN + '/.well-known/jwks.json')
     jwks = json.loads(jUrl.read())
 
     head = jwt.get_unverified_header(token)
