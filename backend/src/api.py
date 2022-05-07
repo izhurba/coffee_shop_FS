@@ -18,6 +18,7 @@ db_drop_and_create_all()
 
 # Endpoint to get drinks with short recipe
 
+
 @app.route('/drinks')
 def get_drinks():
     drinks = Drink.query.all()
@@ -32,25 +33,24 @@ def get_drinks():
 
 # Endpoint to get drinks with recipe in full detail
 
+
 @app.route('/drinks-detail')
 @requires_auth('get:drinks-detail')
 def get_drink_detailed(jwt):
     try:
         drinks = Drink.query.all()
-        
         if not drinks:
             abort(404)
-        
         return jsonify({
             'success': True,
             'drinks': [drink.long() for drink in drinks]
         }), 200
-        
     except Exception as e:
         print(e)
         abort(AuthError)
-        
+
 # Endpoint to create a new drink with a new recipe
+
 
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
@@ -59,8 +59,8 @@ def post_drinks(jwt):
 
     try:
         drink = Drink(
-            title = data['title'],
-            recipe = json.dumps(data['recipe'])
+            title=data['title'],
+            recipe=json.dumps(data['recipe'])
         )
         drink.insert()
 
@@ -73,8 +73,9 @@ def post_drinks(jwt):
     except Exception as e:
         print(e)
         abort(400)
-    
+
 # Endpoint to update an existing drink via Drink.id
+
 
 @app.route('/drinks/<int:id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
@@ -95,12 +96,13 @@ def patch_drink(jwt, id):
         return jsonify({
             'success': True,
             'drinks': [dk.long() for dk in drinks]
-        }),200
+        }), 200
     except Exception as e:
         print(e)
         abort(400)
 
 # Endpoint to delete a drink via Drink.id
+
 
 @app.route('/drinks/<int:id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
@@ -109,7 +111,6 @@ def delete_drink(jwt, id):
 
     if not drink:
         abort(404)
-    
     try:
         drink.delete()
         return jsonify({
@@ -122,6 +123,7 @@ def delete_drink(jwt, id):
 
 # Error Handling
 
+
 @app.errorhandler(400)
 def bad_request_error(error):
     return jsonify({
@@ -129,6 +131,7 @@ def bad_request_error(error):
         'error': 400,
         'message': "Bad Request"
     }), 400
+
 
 @app.errorhandler(404)
 def not_found_error(error):
@@ -138,6 +141,7 @@ def not_found_error(error):
         'message': "Not Found"
         }), 404
 
+
 @app.errorhandler(422)
 def unprocessable(error):
     return jsonify({
@@ -145,6 +149,7 @@ def unprocessable(error):
         "error": 422,
         "message": "unprocessable"
     }), 422
+
 
 @app.errorhandler(AuthError)
 def authorization_error(error):
